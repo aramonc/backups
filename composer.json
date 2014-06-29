@@ -1,5 +1,5 @@
 {
-    "name": "illogicalsystems/backups",
+    "name": "aramonc/backups",
     "minimum-stability": "dev",
     "description": "Commands to perform backups of databases & website/application files",
     "license": "MIT",
@@ -14,7 +14,7 @@
     },
     "autoload": {
         "psr-4": {
-            "IllogicalSystems": "src/"
+            "aramonc": "src/"
         }
     },
     "bin": ["bin/backups.php"]
