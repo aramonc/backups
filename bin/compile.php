@@ -45,14 +45,17 @@ $aggregator->append($getIterator($baseDir . '/vendor/symfony'));
 $phar = new Phar($baseDir . '/build/backup.phar', 0, 'backup');
 
 $phar->startBuffering();
+$autoload = $baseDir . '/vendor/autoload.php';
+$runner = $baseDir . '/bin/backup_runner.php';
 
-$phar->addFile($baseDir . '/bin/backup_runner.php', '/bin/backups.php');
-$phar->addFile($baseDir . '/vendor/autoload.php', '/vendor/autoload.php');
+$phar->addFile($autoload, '/vendor/autoload.php');
+$phar->addFile($runner, '/bin/backups.php');
 
 /** @var SPLFileInfo $file */
 foreach($aggregator as $file) {
-
-    $path = strtr(str_replace(dirname(__DIR__).DIRECTORY_SEPARATOR, '', $file->getRealPath()), '\\', '/');
+    $path = $file->getRealPath();
+    $path = str_replace($baseDir . '/', '', $path);
+    $path = strtr($path, '\\', '/');
 
     echo $path . "\n";
     if($file->isDir()) {
@@ -64,6 +67,7 @@ foreach($aggregator as $file) {
     }
 }
 
-$phar->setStub(file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . 'stub.php'));
+$stub = file_get_contents($baseDir . '/bin/stub.php');
+$phar->setStub($stub);
 
 $phar->stopBuffering();
