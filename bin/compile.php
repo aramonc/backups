@@ -34,14 +34,6 @@ $getIterator = function ($path) use($dirFlags, $nonPHPFilter) {
 
 $baseDir = realpath(dirname(__DIR__));
 
-$aggregator = new AppendIterator();
-$aggregator->append($getIterator($baseDir . '/src'));
-$aggregator->append($getIterator($baseDir . '/vendor/composer'));
-$aggregator->append($getIterator($baseDir . '/vendor/league'));
-$aggregator->append($getIterator($baseDir . '/vendor/phpseclib'));
-$aggregator->append($getIterator($baseDir . '/vendor/pimple'));
-$aggregator->append($getIterator($baseDir . '/vendor/symfony'));
-
 $phar = new Phar($baseDir . '/build/backup.phar', 0, 'backup');
 
 $phar->startBuffering();
@@ -51,23 +43,15 @@ $runner = $baseDir . '/bin/backup_runner.php';
 $phar->addFile($autoload, '/vendor/autoload.php');
 $phar->addFile($runner, '/bin/backups.php');
 
-/** @var SPLFileInfo $file */
-foreach($aggregator as $file) {
-    $path = $file->getRealPath();
-    $path = str_replace($baseDir . '/', '', $path);
-    $path = strtr($path, '\\', '/');
-
-    echo $path . "\n";
-    if($file->isDir()) {
-        $phar->addEmptyDir('/' . $path);
-    }
-
-    if($file->isFile() && !$file->isDir()) {
-        $phar->addFile($file->getRealPath(), $path);
-    }
-}
+$phar->buildFromIterator($getIterator($baseDir . '/src'), $baseDir);
+$phar->buildFromIterator($getIterator($baseDir . '/vendor/composer'), $baseDir);
+$phar->buildFromIterator($getIterator($baseDir . '/vendor/league'), $baseDir);
+$phar->buildFromIterator($getIterator($baseDir . '/vendor/phpseclib'), $baseDir);
+$phar->buildFromIterator($getIterator($baseDir . '/vendor/pimple'), $baseDir);
+$phar->buildFromIterator($getIterator($baseDir . '/vendor/symfony'), $baseDir);
 
 $stub = file_get_contents($baseDir . '/bin/stub.php');
 $phar->setStub($stub);
 
 $phar->stopBuffering();
+
