@@ -19,6 +19,7 @@ class Database extends BaseCommand {
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        var_dump(__DIR__);
+        $config = $this->getConfig($input->getOption('conf'));
+        print_r($config);
     }
 } 

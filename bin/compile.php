@@ -47,8 +47,10 @@ $phar->buildFromIterator($getIterator($baseDir . '/src'), $baseDir);
 $phar->buildFromIterator($getIterator($baseDir . '/vendor/composer'), $baseDir);
 $phar->buildFromIterator($getIterator($baseDir . '/vendor/league'), $baseDir);
 $phar->buildFromIterator($getIterator($baseDir . '/vendor/phpseclib'), $baseDir);
-$phar->buildFromIterator($getIterator($baseDir . '/vendor/pimple'), $baseDir);
 $phar->buildFromIterator($getIterator($baseDir . '/vendor/symfony'), $baseDir);
+$phar->buildFromIterator($getIterator($baseDir . '/vendor/mustangostang'), $baseDir);
+$phar->buildFromIterator($getIterator($baseDir . '/vendor/ocramius'), $baseDir);
+$phar->buildFromIterator($getIterator($baseDir . '/vendor/zendframework'), $baseDir);
 
 $stub = file_get_contents($baseDir . '/bin/stub.php');
 $phar->setStub($stub);

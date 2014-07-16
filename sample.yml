@@ -1,0 +1,23 @@
+use_nice: true
+time_limit: 7200
+database:
+    mysql:
+        host: 'localhost'
+        username: 'root'
+        password: '123'
+        port: 3306
+        databases: ['all']
+        files: true
+        gzip: true
+local:
+    files:
+        path: ['/var/www']
+        gzip: true
+remote:
+    ftp:
+        host: ''
+        protocol: 'sftp'
+        port: 22
+        username: 'test'
+        password: 'test'
+        path: '/home'

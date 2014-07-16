@@ -2,18 +2,21 @@
 
 namespace Ils\Command;
 
-use League\Flysystem\Adapter\Local;
-use League\Flysystem\Filesystem;
+use Ils\Config\ConfigService;
+use Ils\Exception\ConfigFileNotFound;
+use Ils\Exception\ParserNotDetected;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface as InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface as OutputInterface;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
+use Zend\Config\Reader\ReaderInterface;
+use Zend\ServiceManager\ServiceManager;
 
 class BaseCommand extends Command
 {
-    protected $filesystem;
+    protected $sm;
 
     protected function configure()
     {
@@ -26,10 +29,50 @@ class BaseCommand extends Command
             ->addOption('dry-run', null, InputOption::VALUE_OPTIONAL, 'Test backup, but don\'t actually create it');
     }
 
-    protected function getFs()
+    /**
+     * @return ServiceManager
+     */
+    public function getServiceManager()
     {
-        if(!$this->filesystem) {
-//            $this->filesystem = new Filesystem(new Local());
+        return $this->sm;
+    }
+
+    /**
+     * @param ServiceManager $sm
+     */
+    public function setServiceManager(ServiceManager $sm)
+    {
+        $this->sm = $sm;
+    }
+
+    protected function getConfig($path)
+    {
+        $file = new \SplFileInfo($path);
+        if(!$file->isFile()) {
+            throw new ConfigFileNotFound($path);
         }
+
+        /** @var ReaderInterface $parser */
+        $parser = null;
+        switch($file->getExtension()) {
+            case 'yml':
+                $parser = $this->getServiceManager()->get('YamlParser');
+                break;
+            case 'ini':
+                $parser = $this->getServiceManager()->get('IniParser');
+                break;
+            case 'xml':
+                $parser = $this->getServiceManager()->get('YamlParser');
+                break;
+            case 'json':
+                $parser = $this->getServiceManager()->get('YamlParser');
+                break;
+        }
+
+        if(is_null($parser)) {
+            throw new ParserNotDetected($path);
+        }
+
+        return $parser->fromFile($path);
     }
 } 
