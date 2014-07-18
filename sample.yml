@@ -1,5 +1,6 @@
 use_nice: true
 time_limit: 7200
+tmp_storage: '/home/vagrant/backups'
 database:
     mysql:
         host: 'localhost'

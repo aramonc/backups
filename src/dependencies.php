@@ -16,6 +16,7 @@ return array(
         '\\Zend\\Config\\Reader\\Yaml' => "\\Ils\\Factories\\YamlParser",
     ),
     'services' => array(
+        '\\Ils\\Component\\MySQLDump' => new \Ils\Component\MySQLDump(),
         '\\League\\Flysystem\\Adapter\\Local' => new \League\Flysystem\Adapter\Local('/'),
         '\\Zend\\Config\\Reader\\Ini' => new \Zend\Config\Reader\Ini(),
         '\\Zend\\Config\\Reader\\Xml' => new \Zend\Config\Reader\Xml(),
@@ -28,5 +29,6 @@ return array(
         'IniParser' => "\\Zend\\Config\\Reader\\Ini",
         'XmlParser' => "\\Zend\\Config\\Reader\\Xml",
         'JsonParser' => "\\Zend\\Config\\Reader\\Json",
+        'mysql' => "\\Ils\\Component\\MySQLDump",
     ),
 );

@@ -2,7 +2,6 @@
 
 namespace Ils\Command;
 
-use Ils\Config\ConfigService;
 use Ils\Exception\ConfigFileNotFound;
 use Ils\Exception\ParserNotDetected;
 use Symfony\Component\Console\Command\Command;
@@ -21,12 +20,13 @@ class BaseCommand extends Command
     protected function configure()
     {
         $this
+            ->addOption('conf', 'c', InputOption::VALUE_REQUIRED, 'Configuration for the database connection')
             ->addOption('name', null, InputOption::VALUE_REQUIRED, 'The file name of the backup')
             ->addOption('location', 'l', InputOption::VALUE_REQUIRED, 'The path to store the backups')
             ->addOption('send', 's', InputOption::VALUE_NONE, 'Send the backup to a remote server')
             ->addOption('send-config', null, InputOption::VALUE_OPTIONAL, 'Configuration of where to send the backup')
             ->addOption('compress', null, InputOption::VALUE_NONE, 'Compress the file(s) generated')
-            ->addOption('dry-run', null, InputOption::VALUE_OPTIONAL, 'Test backup, but don\'t actually create it');
+            ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Test backup, but don\'t actually create it');
     }
 
     /**
