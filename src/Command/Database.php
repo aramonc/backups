@@ -28,6 +28,8 @@ class Database extends BaseCommand {
                 ->setDryRun($input->getOption('dry-run'))
                 ->run($output);
         }
+
+        $package = $this->packageFiles($input->getOption('name'), new \SplFileInfo($config['tmp_storage']), !!$dbConfig['gzip']);
     }
 
     /**

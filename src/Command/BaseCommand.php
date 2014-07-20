@@ -32,7 +32,7 @@ class BaseCommand extends Command
     /**
      * @return ServiceManager
      */
-    public function getServiceManager()
+    protected function getServiceManager()
     {
         return $this->sm;
     }
@@ -40,11 +40,17 @@ class BaseCommand extends Command
     /**
      * @param ServiceManager $sm
      */
-    public function setServiceManager(ServiceManager $sm)
+    protected function setServiceManager(ServiceManager $sm)
     {
         $this->sm = $sm;
     }
 
+    /**
+     * @param $path
+     * @return array
+     * @throws \Ils\Exception\ConfigFileNotFound
+     * @throws \Ils\Exception\ParserNotDetected
+     */
     protected function getConfig($path)
     {
         $file = new \SplFileInfo($path);
@@ -74,5 +80,26 @@ class BaseCommand extends Command
         }
 
         return $parser->fromFile($path);
+    }
+
+    protected function packageFiles($name, \SplFileInfo $path, $compress = false)
+    {
+        $file = $path->getRealPath() . DIRECTORY_SEPARATOR . $name . '.tar.gz';
+        $phar = new \PharData($file, \Phar::CURRENT_AS_FILEINFO | \Phar::KEY_AS_PATHNAME, $name, \Phar::TAR);
+
+        if($compress && $phar->canCompress(\Phar::GZ)) {
+            $phar->compress(\Phar::GZ);
+        }
+
+        $phar->buildFromDirectory($path->getRealPath());
+
+        $files = new \DirectoryIterator($path->getRealPath());
+        foreach($files as $file) {
+            if($file->getExtension() != 'gz' && !$file->isDot()) {
+                unlink($file->getRealPath());
+            }
+        }
+
+        return $file;
     }
 } 
