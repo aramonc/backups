@@ -4,12 +4,10 @@ namespace Ils\Command;
 
 use Ils\Exception\ConfigFileNotFound;
 use Ils\Exception\ParserNotDetected;
+use League\Flysystem\Adapter\Sftp;
+use League\Flysystem\Filesystem;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface as InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface as OutputInterface;
-use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Zend\Config\Reader\ReaderInterface;
 use Zend\ServiceManager\ServiceManager;
 
@@ -40,7 +38,7 @@ class BaseCommand extends Command
     /**
      * @param ServiceManager $sm
      */
-    protected function setServiceManager(ServiceManager $sm)
+    public function setServiceManager(ServiceManager $sm)
     {
         $this->sm = $sm;
     }
@@ -82,6 +80,12 @@ class BaseCommand extends Command
         return $parser->fromFile($path);
     }
 
+    /**
+     * @param $name
+     * @param \SplFileInfo $path
+     * @param bool $compress
+     * @return \DirectoryIterator|string
+     */
     protected function packageFiles($name, \SplFileInfo $path, $compress = false)
     {
         $file = $path->getRealPath() . DIRECTORY_SEPARATOR . $name . '.tar.gz';
@@ -90,16 +94,29 @@ class BaseCommand extends Command
         if($compress && $phar->canCompress(\Phar::GZ)) {
             $phar->compress(\Phar::GZ);
         }
-
-        $phar->buildFromDirectory($path->getRealPath());
+        $phar->startBuffering();
+        $phar->buildFromDirectory($path->getRealPath(), '/(?<!\.gz)$/');
+        $phar->stopBuffering();
 
         $files = new \DirectoryIterator($path->getRealPath());
-        foreach($files as $file) {
-            if($file->getExtension() != 'gz' && !$file->isDot()) {
-                unlink($file->getRealPath());
+        foreach($files as $f) {
+            if($f->getExtension() != 'gz' && !$f->isDot()) {
+                unlink($f->getRealPath());
             }
         }
 
         return $file;
+    }
+
+    protected function sendFiles(\SplFileInfo $path, $location, $config)
+    {
+        $adapter = new Sftp($config);
+        $fs = new Filesystem($adapter);
+
+        $stream = fopen($path->getRealPath(), 'r+');
+        $fs->writeStream($location . DIRECTORY_SEPARATOR . $path->getFilename(), $stream);
+        fclose($stream);
+
+        unlink($path->getRealPath());
     }
 } 

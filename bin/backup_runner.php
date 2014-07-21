@@ -12,5 +12,8 @@ $serviceLocator = new \Zend\ServiceManager\ServiceManager($config);
 $db = new Command\Database();
 $db->setServiceManager($serviceLocator);
 
-$app->addCommands([$db]);
+$file = new Command\File();
+$file->setServiceManager($serviceLocator);
+
+$app->addCommands([$db, $file]);
 $app->run();

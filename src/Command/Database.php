@@ -2,9 +2,7 @@
 namespace Ils\Command;
 
 use Ils\BackupInterface;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 
@@ -29,7 +27,10 @@ class Database extends BaseCommand {
                 ->run($output);
         }
 
-        $package = $this->packageFiles($input->getOption('name'), new \SplFileInfo($config['tmp_storage']), !!$dbConfig['gzip']);
+        $package = $this->packageFiles($input->getOption('name'), new \SplFileInfo($config['tmp_storage']), !!$config['gzip']);
+        if(isset($config['remote']) && !empty($config['remote'])) {
+            $this->sendFiles(new \SplFileInfo($package), $input->getOption('location'), $config['remote']['ftp']);
+        }
     }
 
     /**

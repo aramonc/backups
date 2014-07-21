@@ -1,6 +1,7 @@
 use_nice: true
 time_limit: 7200
 tmp_storage: '/home/vagrant/backups'
+gzip: true
 database:
     mysql:
         host: 'localhost'
@@ -9,16 +10,12 @@ database:
         port: 3306
         databases: ['all']
         files: true
-        gzip: true
-local:
-    files:
-        path: ['/var/www']
-        gzip: true
+files: ['/var/www']
 remote:
     ftp:
-        host: ''
+        host: 'illogicalsystems.com'
         protocol: 'sftp'
         port: 22
-        username: 'test'
-        password: 'test'
-        path: '/home'
+        username: 'root'
+        password: '?jC92D7ZE=LRmK62;ZeZ'
+        root: '/root/backups'
