@@ -15,5 +15,5 @@ $db->setServiceManager($serviceLocator);
 $file = new Command\File();
 $file->setServiceManager($serviceLocator);
 
-$app->addCommands([$db, $file]);
+$app->addCommands(array($db, $file));
 $app->run();

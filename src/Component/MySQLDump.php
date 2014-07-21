@@ -159,7 +159,7 @@ class MySQLDump implements BackupInterface
     {
         $cmd = "";
         if ($this->isUseNice()) {
-            $cmd .= "/usr/bin/nice -n 19 ";
+            $cmd .= "/bin/nice -n 19 ";
         }
         $cmd .= "mysqldump ";
         $cmd .= "-u %s ";
@@ -175,11 +175,11 @@ class MySQLDump implements BackupInterface
         $cmd .= "--routines ";
         $cmd .= "--result-file=%s ";
 
-        $username = $this->getConfig()['username'];
-        $password = $this->getConfig()['password'];
-        $host = $this->getConfig()['host'];
-        $port = isset($this->getConfig()['port']) && !empty($this->getConfig()['port']) ? $this->getConfig(
-        )['port'] : '3306';
+        $config = $this->getConfig();
+        $username = $config['username'];
+        $password = $config['password'];
+        $host = $config['host'];
+        $port = isset($config['port']) && !empty($config['port']) ? $config['port'] : '3306';
         $filePath = $this->getPath();
 
         if ($this->all) {
@@ -204,8 +204,9 @@ class MySQLDump implements BackupInterface
      */
     protected function getDatabasesList()
     {
+        $config = $this->getConfig();
         exec(
-            sprintf("mysqlshow -u %s -p'%s'", $this->getConfig()['username'], $this->getConfig()['password']),
+            sprintf("mysqlshow -u %s -p'%s'", $config['username'], $config['password']),
             $list
         );
         $dbs = array();
