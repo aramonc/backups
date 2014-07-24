@@ -7,7 +7,9 @@ use Ils\Exception\ParserNotDetected;
 use League\Flysystem\Adapter\Sftp;
 use League\Flysystem\Filesystem;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 use Zend\Config\Reader\ReaderInterface;
 use Zend\ServiceManager\ServiceManager;
 
@@ -81,31 +83,25 @@ class BaseCommand extends Command
     }
 
     /**
+     * @param OutputInterface $output
      * @param $name
-     * @param \SplFileInfo $path
+     * @param array $files
      * @param bool $compress
      * @return \DirectoryIterator|string
      */
-    protected function packageFiles($name, \SplFileInfo $path, $compress = false)
+    protected function packageFiles(OutputInterface $output, $name, array $files, $compress = false)
     {
-        $file = $path->getRealPath() . DIRECTORY_SEPARATOR . $name . '.tar.gz';
-        $phar = new \PharData($file, \Phar::CURRENT_AS_FILEINFO | \Phar::KEY_AS_PATHNAME, $name, \Phar::TAR);
-
-        if($compress && $phar->canCompress(\Phar::GZ)) {
-            $phar->compress(\Phar::GZ);
+        $command = $this->getApplication()->find('package');
+        $arguments = array(
+            '--name' => $name,
+        );
+        if($compress) {
+            $arguments['--compress'] = $compress;
         }
-        $phar->startBuffering();
-        $phar->buildFromDirectory($path->getRealPath(), '/(?<!\.gz)$/');
-        $phar->stopBuffering();
-
-        $files = new \DirectoryIterator($path->getRealPath());
-        foreach($files as $f) {
-            if($f->getExtension() != 'gz' && !$f->isDot()) {
-                unlink($f->getRealPath());
-            }
-        }
-
-        return $file;
+        $arguments['files'] = $files;
+        $input = new ArrayInput($arguments);
+        $result = $command->run($input, $output);
+        print_r($result);
     }
 
     protected function sendFiles(\SplFileInfo $path, $location, $config)

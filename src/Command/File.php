@@ -24,11 +24,11 @@ class File extends BaseCommand {
         if($config['gzip'] && $phar->canCompress(\Phar::GZ)) {
             $phar->compress(\Phar::GZ);
         }
-        $phar->startBuffering();
+//        $phar->startBuffering();
         foreach($config['files'] as $path) {
             $phar->buildFromDirectory($path);
         }
-        $phar->stopBuffering();
+//        $phar->stopBuffering();
 
         if(isset($config['remote']) && !empty($config['remote'])) {
             $this->sendFiles(new \SplFileInfo($archivePath), $input->getOption('location'), $config['remote']['ftp']);

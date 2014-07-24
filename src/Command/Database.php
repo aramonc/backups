@@ -18,6 +18,7 @@ class Database extends BaseCommand {
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $config = $this->getConfig($input->getOption('conf'));
+        $files = array();
         foreach($config['database'] as $type => $dbConfig) {
             $svc = $this->getBUService($type);
             $svc->setConfig($dbConfig)
@@ -25,11 +26,18 @@ class Database extends BaseCommand {
                 ->setPath($config['tmp_storage'])
                 ->setDryRun($input->getOption('dry-run'))
                 ->run($output);
+            $files = array_merge($files, $svc->getFiles());
         }
 
-        $package = $this->packageFiles($input->getOption('name'), new \SplFileInfo($config['tmp_storage']), !!$config['gzip']);
-        if(isset($config['remote']) && !empty($config['remote'])) {
-            $this->sendFiles(new \SplFileInfo($package), $input->getOption('location'), $config['remote']['ftp']);
+        $package = $config['tmp_storage'] . DIRECTORY_SEPARATOR . $input->getOption('name');
+        $this->packageFiles($output, $package, $files, !!$config['gzip']);
+        foreach($files as $file) {
+            unlink($file);
+        }
+        $found = glob($package . '*');
+
+        if(isset($config['remote']) && !empty($config['remote']) && count($found) > 0) {
+            $this->sendFiles(new \SplFileInfo($found[0]), $input->getOption('location'), $config['remote']['ftp']);
         }
     }
 
