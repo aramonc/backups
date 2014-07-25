@@ -23,7 +23,7 @@ class MySQLDump implements BackupInterface
     /** @var bool */
     protected $dryRun = false;
     /** @var array  */
-    protected $files = [];
+    protected $files = array();
 
 
     /**

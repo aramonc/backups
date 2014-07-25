@@ -25,9 +25,10 @@ class Package extends BaseCommand {
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $files = $input->getArgument('files');
+        $code = 0;
 
         if(empty($files)) {
-            return '';
+            return $code;
         }
 
         if($input->getOption('compress')) {
@@ -35,10 +36,10 @@ class Package extends BaseCommand {
         }
 
         if($this->canUse('tar')) {
-            $this->package($files, $input->getOption('name'), 'tar');
+            $code = $this->package($files, $input->getOption('name'), 'tar');
         }
 
-        return '';
+        return $code;
     }
 
     /**
@@ -65,11 +66,12 @@ class Package extends BaseCommand {
     }
 
     /**
+     * @param $command
      * @return bool
      */
     protected function canUse($command)
     {
-        system('which ' . $command, $code);
+        exec('which ' . $command, $null, $code);
         return $code === 0;
     }
 
@@ -80,7 +82,8 @@ class Package extends BaseCommand {
      */
     protected function package($files, $name, $format)
     {
-        $cmd = system('which ' . $format);
+        exec('which ' . $format, $cmd);
+        $cmd = $cmd[0];
         $options = 'cpf';
         $name .= '.tar';
 
@@ -98,7 +101,8 @@ class Package extends BaseCommand {
         }
 
         $cmd .= ' -' . $options . ' ' . $name . ' ' . implode(' ', $files);
-        print_r($cmd);
-        system($cmd);
+        exec($cmd, $result, $code);
+
+        return $code;
     }
 } 
