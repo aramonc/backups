@@ -31,9 +31,7 @@ class Database extends BaseCommand {
 
         $package = $config['tmp_storage'] . DIRECTORY_SEPARATOR . $input->getOption('name');
         $this->packageFiles($output, $package, $files, !!$config['gzip']);
-        foreach($files as $file) {
-            unlink($file);
-        }
+
         $found = glob($package . '*');
 
         if(isset($config['remote']) && !empty($config['remote']) && count($found) > 0) {

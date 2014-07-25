@@ -100,8 +100,7 @@ class BaseCommand extends Command
         }
         $arguments['files'] = $files;
         $input = new ArrayInput($arguments);
-        $result = $command->run($input, $output);
-        print_r($result);
+        return $command->run($input, $output);
     }
 
     protected function sendFiles(\SplFileInfo $path, $location, $config)
