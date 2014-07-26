@@ -18,5 +18,11 @@ $file->setServiceManager($serviceLocator);
 $pack = new Command\Package();
 $pack->setServiceManager($serviceLocator);
 
-$app->addCommands(array($db, $file, $pack));
+$send = new Command\Send();
+$send->setServiceManager($serviceLocator);
+
+$remove = new Command\Remove();
+$remove->setServiceManager($serviceLocator);
+
+$app->addCommands(array($db, $file, $pack, $send, $remove));
 $app->run();

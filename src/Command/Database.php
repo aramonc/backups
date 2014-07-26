@@ -4,7 +4,6 @@ namespace Ils\Command;
 use Ils\BackupInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 
 class Database extends BaseCommand {
 
@@ -29,14 +28,21 @@ class Database extends BaseCommand {
             $files = array_merge($files, $svc->getFiles());
         }
 
-        $package = $config['tmp_storage'] . DIRECTORY_SEPARATOR . $input->getOption('name');
-        $this->packageFiles($output, $package, $files, !!$config['gzip']);
+        $packageName = $config['tmp_storage'] . DIRECTORY_SEPARATOR . $input->getOption('name');
+        $code = $this->packageFiles($output, $packageName, $files, !!$config['gzip']);
 
-        $found = glob($package . '*');
+        $found = glob($packageName . '*');
 
         if(isset($config['remote']) && !empty($config['remote']) && count($found) > 0) {
-            $this->sendFiles(new \SplFileInfo($found[0]), $input->getOption('location'), $config['remote']['ftp']);
+            $code = $code | $this->sendFiles($output, new \SplFileInfo($found[0]), $input->getOption('location'), $input->getOption('conf'));
+            if($code === 0) {
+                $this->removeFiles($output, array($found[0]));
+            }
         }
+
+        $code = $code | $this->removeFiles($output, $files);
+
+        return $code;
     }
 
     /**

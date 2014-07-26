@@ -4,8 +4,6 @@ namespace Ils\Command;
 
 use Ils\Exception\ConfigFileNotFound;
 use Ils\Exception\ParserNotDetected;
-use League\Flysystem\Adapter\Sftp;
-use League\Flysystem\Filesystem;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputOption;
@@ -82,12 +80,34 @@ class BaseCommand extends Command
         return $parser->fromFile($path);
     }
 
+
+    /**
+     * @param string $command
+     * @return bool
+     */
+    protected function canUse($command)
+    {
+        exec('which ' . $command, $null, $code);
+        return $code === 0;
+    }
+
+    /**
+     * @param string $command
+     * @return string
+     */
+    protected function getCmd($command)
+    {
+        exec('which ' . $command, $path);
+        return $path[0];
+    }
+
     /**
      * @param OutputInterface $output
      * @param $name
      * @param array $files
      * @param bool $compress
-     * @return \DirectoryIterator|string
+     * @return int
+     * @throws \Exception
      */
     protected function packageFiles(OutputInterface $output, $name, array $files, $compress = false)
     {
@@ -103,15 +123,39 @@ class BaseCommand extends Command
         return $command->run($input, $output);
     }
 
-    protected function sendFiles(\SplFileInfo $path, $location, $config)
+    /**
+     * @param OutputInterface $output
+     * @param \SplFileInfo $file
+     * @param $location
+     * @param $config
+     * @return int
+     * @throws \Exception
+     */
+    protected function sendFiles(OutputInterface $output, \SplFileInfo $file, $location, $config)
     {
-        $adapter = new Sftp($config);
-        $fs = new Filesystem($adapter);
+        $command = $this->getApplication()->find('send');
+        $arguments = array(
+            '--conf' => $config,
+            '--location' => $location,
+            'files' => array($file->getRealPath())
+        );
 
-        $stream = fopen($path->getRealPath(), 'r+');
-        $fs->writeStream($location . DIRECTORY_SEPARATOR . $path->getFilename(), $stream);
-        fclose($stream);
+        return $command->run(new ArrayInput($arguments),  $output);
+    }
 
-        unlink($path->getRealPath());
+    /**
+     * @param OutputInterface $output
+     * @param array $files
+     * @return int
+     * @throws \Exception
+     */
+    protected function removeFiles(OutputInterface $output, array $files)
+    {
+        $command = $this->getApplication()->find('remove');
+        $arguments = array(
+            'files' => $files
+        );
+
+        return $command->run(new ArrayInput($arguments), $output);
     }
 } 

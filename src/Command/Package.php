@@ -66,16 +66,6 @@ class Package extends BaseCommand {
     }
 
     /**
-     * @param $command
-     * @return bool
-     */
-    protected function canUse($command)
-    {
-        exec('which ' . $command, $null, $code);
-        return $code === 0;
-    }
-
-    /**
      * @param array $files
      * @param string $name
      * @param string $format
