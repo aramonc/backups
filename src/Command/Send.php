@@ -2,7 +2,7 @@
 namespace Ils\Command;
 
 use Ils\FileSystem\FileSystem;
-use Ils\SftpAdapter;
+use Ils\FileSystem\SftpAdapter;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;

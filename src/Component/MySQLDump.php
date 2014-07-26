@@ -161,7 +161,8 @@ class MySQLDump implements BackupInterface
     {
         $cmd = "";
         if ($this->isUseNice()) {
-            $cmd .= system('which nice') . " -n 19 ";
+            exec('which nice', $command) ;
+            $cmd .= $command[0] . " -n 19 ";
         }
         $cmd .= "mysqldump ";
         $cmd .= "-u %s ";

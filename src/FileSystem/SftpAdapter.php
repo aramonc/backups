@@ -1,6 +1,6 @@
 <?php
 
-namespace Ils;
+namespace Ils\FileSystem;
 
 use League\Flysystem\Adapter\Sftp;
 use League\Flysystem\Util;
