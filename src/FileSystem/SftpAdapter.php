@@ -10,6 +10,16 @@ class SftpAdapter extends Sftp
 
     public function writeStream($path, $contents, $config = null)
     {
+        return $this->uploadStream($path, $contents, $config);
+    }
+
+    public function updateStream($path, $contents, $config = null)
+    {
+        return $this->uploadStream($path, $contents, $config);
+    }
+
+    protected function uploadStream($path, $contents, $config = null)
+    {
         $connection = $this->getConnection();
         $this->ensureDirectory(Util::dirname($path));
         $config = Util::ensureConfig($config);
@@ -24,5 +34,4 @@ class SftpAdapter extends Sftp
 
         return compact('contents', 'visibility');
     }
-
 }

@@ -34,7 +34,7 @@ class Send extends BaseCommand {
 
         foreach($input->getArgument('files') as $path) {
             $file = new \SplFileInfo($path);
-            $fs->writeStream($input->getOption('location') . DIRECTORY_SEPARATOR . $file->getFilename(), $file);
+            $fs->putStream($input->getOption('location') . DIRECTORY_SEPARATOR . $file->getFilename(), $file);
         }
 
         return 0;
