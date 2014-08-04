@@ -13,9 +13,9 @@ database:
 files: ['/var/www']
 remote:
     ftp:
-        host: 'illogicalsystems.com'
+        host: '192.168.0.132'
         protocol: 'sftp'
         port: 22
-        username: 'root'
-        password: '?jC92D7ZE=LRmK62;ZeZ'
-        root: '/root/backups'
+        username: 'ftp_test'
+        password: 'KsL7yxXS%}75-)d'
+        root: '/tmp/backups'
